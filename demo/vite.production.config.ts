@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import styleImport from 'vite-plugin-style-import';
 import path from 'path';
 import { injectHtml } from 'vite-plugin-html';
+import qiankun from 'vite-plugin-qiankun';
 
 export default defineConfig({
   resolve: {
@@ -66,6 +67,9 @@ export default defineConfig({
           resolveComponent: name => `@arco-design/web-react/icon/react-icon/${name}`,
         },
       ],
+    }),
+    qiankun('easyBlockEditor', {
+      useDevMode: false,
     }),
     injectHtml({
       data: {

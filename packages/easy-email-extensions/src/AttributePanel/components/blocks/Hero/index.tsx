@@ -1,6 +1,11 @@
 import React from 'react';
 import { BackgroundColor } from '@extensions/AttributePanel/components/attributes/BackgroundColor';
-import { ImageUploaderField, InputWithUnitField, RadioGroupField, TextField } from '@extensions/components/Form';
+import {
+  ImageUploaderField,
+  InputWithUnitField,
+  RadioGroupField,
+  TextField,
+} from '@extensions/components/Form';
 import { Width } from '@extensions/AttributePanel/components/attributes/Width';
 import { Height } from '@extensions/AttributePanel/components/attributes/Height';
 import { VerticalAlign } from '@extensions/AttributePanel/components/attributes/VerticalAlign';
@@ -28,7 +33,7 @@ const options = [
 
 export function Hero() {
   const { focusIdx } = useFocusIdx();
-  const { onUploadImage } = useEditorProps();
+  const { onUploadImage, mediaLibraryRef } = useEditorProps();
 
   return (
     <AttributesPanelWrapper>
@@ -71,6 +76,7 @@ export function Hero() {
                 'The image suffix should be .jpg, jpeg, png, gif, etc. Otherwise, the picture may not be displayed normally.',
               )}
               uploadHandler={onUploadImage}
+              mediaLibraryRef={mediaLibraryRef}
             />
 
             <Grid.Row>

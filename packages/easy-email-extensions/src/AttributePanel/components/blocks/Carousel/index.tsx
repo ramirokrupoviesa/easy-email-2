@@ -181,7 +181,7 @@ function CarouselImage({
   index: number;
 }) {
   const { focusIdx } = useFocusIdx();
-  const { onUploadImage } = useEditorProps();
+  const { onUploadImage, mediaLibraryRef } = useEditorProps();
   return (
     <Space direction='vertical'>
       <ImageUploaderField
@@ -192,6 +192,7 @@ function CarouselImage({
           'The image suffix should be .jpg, jpeg, png, gif, etc. Otherwise, the picture may not be displayed normally.',
         )}
         uploadHandler={onUploadImage}
+        mediaLibraryRef={mediaLibraryRef}
       />
       <Grid.Row>
         <Grid.Col span={11}>

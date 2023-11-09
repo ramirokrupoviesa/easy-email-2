@@ -1,10 +1,16 @@
-import React, { useState, useCallback, useRef, useMemo } from 'react';
+import React, {
+  useState,
+  useCallback,
+  //  useRef,
+  useMemo,
+  useEffect,
+} from 'react';
 import {
   Dropdown,
   Grid,
   Input,
   Menu,
-  Message,
+  // Message,
   Modal,
   Popover,
   Spin,
@@ -12,87 +18,103 @@ import {
 } from '@arco-design/web-react';
 import { IconPlus, IconEye, IconDelete, IconAt } from '@arco-design/web-react/icon';
 import styles from './index.module.scss';
-import { Uploader, UploaderServer } from '@extensions/AttributePanel/utils/Uploader';
+import {
+  // Uploader,
+  UploaderServer,
+} from '@extensions/AttributePanel/utils/Uploader';
 import { classnames } from '@extensions/AttributePanel/utils/classnames';
-import { previewLoadImage } from '@extensions/AttributePanel/utils/previewLoadImage';
+// import { previewLoadImage } from '@extensions/AttributePanel/utils/previewLoadImage';
 import { MergeTags } from '@extensions';
 import { IconFont, useEditorProps } from 'easy-email-editor';
+
+type MediaBrowserRef = {
+  value: string | undefined;
+  target: string | undefined;
+  showModal: () => void;
+  setValue: (val: string | undefined) => void;
+  setTarget: (target: string) => void;
+};
 
 export interface ImageUploaderProps {
   onChange: (val: string) => void;
   value: string;
   label: string;
   uploadHandler?: UploaderServer;
-  autoCompleteOptions?: Array<{ value: string; label: React.ReactNode; }>;
+  autoCompleteOptions?: Array<{ value: string; label: React.ReactNode }>;
+  mediaLibraryRef: MediaBrowserRef;
+  name: string;
 }
 
 export function ImageUploader(props: ImageUploaderProps) {
   const { mergeTags } = useEditorProps();
   const [isUploading, setIsUploading] = useState(false);
   const [preview, setPreview] = useState(false);
-  const uploadHandlerRef = useRef<UploaderServer | null | undefined>(
-    props.uploadHandler
-  );
+  // const uploadHandlerRef = useRef<UploaderServer | null | undefined>(props.uploadHandler);
 
   const onChange = props.onChange;
 
-  const onUpload = useCallback(() => {
-    if (isUploading) {
-      return Message.warning(t('Uploading...'));
+  useEffect(() => {
+    if (props.mediaLibraryRef.value && props.mediaLibraryRef.target === props.name) {
+      onChange(props.mediaLibraryRef.value);
+      props.mediaLibraryRef.setValue(undefined);
     }
-    if (!uploadHandlerRef.current) return;
+  }, [props.mediaLibraryRef, onChange, props.name]);
 
-    const uploader = new Uploader(uploadHandlerRef.current, {
-      limit: 1,
-      accept: 'image/*',
-    });
+  // const onUpload = useCallback(() => {
+  //   if (isUploading) {
+  //     return Message.warning(t('Uploading...'));
+  //   }
+  //   if (!uploadHandlerRef.current) return;
 
-    uploader.on('start', (photos) => {
-      setIsUploading(true);
+  //   const uploader = new Uploader(uploadHandlerRef.current, {
+  //     limit: 1,
+  //     accept: 'image/*',
+  //   });
 
-      uploader.on('end', (data) => {
-        const url = data[0]?.url;
-        if (url) {
-          onChange(url);
-        }
-        setIsUploading(false);
-      });
-    });
+  //   uploader.on('start', photos => {
+  //     setIsUploading(true);
 
-    uploader.chooseFile();
-  }, [isUploading, onChange]);
+  //     uploader.on('end', data => {
+  //       const url = data[0]?.url;
+  //       if (url) {
+  //         onChange(url);
+  //       }
+  //       setIsUploading(false);
+  //     });
+  //   });
 
-  const onPaste = useCallback(
-    async (e: React.ClipboardEvent<HTMLInputElement>) => {
-      if (!uploadHandlerRef.current) return;
-      const clipboardData = e.clipboardData;
+  //   uploader.chooseFile();
+  // }, [isUploading, onChange]);
 
-      for (let i = 0; i < clipboardData.items.length; i++) {
-        const item = clipboardData.items[i];
-        if (item.kind == 'file') {
-          const blob = item.getAsFile();
-
-          if (!blob || blob.size === 0) {
-            return;
-          }
-          try {
-            setIsUploading(true);
-            const picture = await uploadHandlerRef.current(blob);
-            await previewLoadImage(picture);
-            props.onChange(picture);
-            setIsUploading(false);
-          } catch (error: any) {
-            Message.error(error?.message || error || t('Upload failed'));
-            setIsUploading(false);
-          }
-        }
-      }
-    },
-    [props]
-  );
+  // const onPaste = useCallback(
+  //   async (e: React.ClipboardEvent<HTMLInputElement>) => {
+  //     const clipboardData = e.clipboardData;
+  //     for (let i = 0; i < clipboardData.items.length; i++) {
+  //       const item = clipboardData.items[i];
+  //       if (item.kind == 'file') {
+  //         const blob = item.getAsFile();
+  //         if (!blob || blob.size === 0) {
+  //           return;
+  //         }
+  //         try {
+  //           setIsUploading(true);
+  //           const picture = await uploadHandlerRef.current(blob);
+  //           await previewLoadImage(picture);
+  //           props.onChange(picture);
+  //           setIsUploading(false);
+  //         } catch (error: any) {
+  //           Message.error(error?.message || error || t('Upload failed'));
+  //           setIsUploading(false);
+  //         }
+  //       }
+  //     }
+  //   },
+  //   [props],
+  // );
 
   const onRemove = useCallback(() => {
     props.onChange('');
+    props.mediaLibraryRef.setValue(undefined);
   }, [props]);
 
   const content = useMemo(() => {
@@ -109,9 +131,15 @@ export function ImageUploader(props: ImageUploaderProps) {
 
     if (!props.value) {
       return (
-        <div className={styles['upload']} onClick={onUpload}>
+        <div
+          className={styles['upload']}
+          onClick={() => {
+            props.mediaLibraryRef.setTarget(props.name);
+            props.mediaLibraryRef.showModal();
+          }}
+        >
           <IconPlus />
-          <div>Upload</div>
+          <div>Set Image</div>
         </div>
       );
     }
@@ -121,21 +149,32 @@ export function ImageUploader(props: ImageUploaderProps) {
         <div className={classnames(styles['info'])}>
           <img src={props.value} />
           <div className={styles['btn-wrap']}>
-            <a title={t('Preview')} onClick={() => setPreview(true)}>
+            <a
+              title={t('Preview')}
+              onClick={() => setPreview(true)}
+            >
               <IconEye />
             </a>
-            <a title={t('Remove')} onClick={() => onRemove()}>
+            <a
+              title={t('Remove')}
+              onClick={() => onRemove()}
+            >
               <IconDelete />
             </a>
           </div>
         </div>
       </div>
     );
-  }, [isUploading, onRemove, onUpload, props.value]);
+  }, [isUploading, onRemove, props.value, props.mediaLibraryRef, props.name]);
 
-  if (!props.uploadHandler) {
-    return <Input value={props.value} onChange={onChange} />;
-  }
+  // if (!props.uploadHandler) {
+  //   return (
+  //     <Input
+  //       value={props.value}
+  //       onChange={onChange}
+  //     />
+  //   );
+  // }
 
   return (
     <div className={styles.wrap}>
@@ -145,47 +184,65 @@ export function ImageUploader(props: ImageUploaderProps) {
           {mergeTags && (
             <Popover
               trigger='click'
-              content={<MergeTags value={props.value} onChange={onChange} />}
+              content={
+                <MergeTags
+                  value={props.value}
+                  onChange={onChange}
+                />
+              }
             >
               <ArcoButton icon={<IconFont iconName='icon-merge-tags' />} />
             </Popover>
           )}
           <Input
             style={{ flex: 1 }}
-            onPaste={onPaste}
+            // onPaste={onPaste}
             value={props.value}
             onChange={onChange}
             disabled={isUploading}
-
           />
           {props.autoCompleteOptions && (
             <Dropdown
-              position="tr"
-              droplist={(
-                <Menu onClickMenuItem={(indexStr) => {
-                  if (!props.autoCompleteOptions) return;
-                  onChange(props.autoCompleteOptions[+indexStr]?.value);
-                }}
+              position='tr'
+              droplist={
+                <Menu
+                  onClickMenuItem={indexStr => {
+                    if (!props.autoCompleteOptions) return;
+                    onChange(props.autoCompleteOptions[+indexStr]?.value);
+                  }}
                 >
-                  {
-                    props.autoCompleteOptions.map((item, index) => {
-                      return (
-                        <Menu.Item style={{ display: 'flex', alignItems: 'center' }} key={index.toString()}>
-                          <img src={item.value} style={{ width: 20, height: 20 }} />&emsp;<span>{item.label}</span>
-                        </Menu.Item>
-                      );
-                    })
-                  }
+                  {props.autoCompleteOptions.map((item, index) => {
+                    return (
+                      <Menu.Item
+                        style={{ display: 'flex', alignItems: 'center' }}
+                        key={index.toString()}
+                      >
+                        <img
+                          src={item.value}
+                          style={{ width: 20, height: 20 }}
+                        />
+                        &emsp;<span>{item.label}</span>
+                      </Menu.Item>
+                    );
+                  })}
                 </Menu>
-              )}
+              }
             >
               <ArcoButton icon={<IconAt />} />
             </Dropdown>
           )}
         </Grid.Row>
       </div>
-      <Modal visible={preview} footer={null} onCancel={() => setPreview(false)}>
-        <img alt={t('Preview')} style={{ width: '100%' }} src={props.value} />
+      <Modal
+        visible={preview}
+        footer={null}
+        onCancel={() => setPreview(false)}
+      >
+        <img
+          alt={t('Preview')}
+          style={{ width: '100%' }}
+          src={props.value}
+        />
       </Modal>
     </div>
   );

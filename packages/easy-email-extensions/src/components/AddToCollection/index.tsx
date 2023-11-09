@@ -10,13 +10,9 @@ export const AddToCollection: React.FC<{
   setVisible: (v: boolean) => void;
 }> = ({ visible, setVisible }) => {
   const { focusBlock: focusBlockData } = useBlock();
-  const { onAddCollection, onUploadImage } = useEditorProps();
+  const { onAddCollection, onUploadImage, mediaLibraryRef } = useEditorProps();
 
-  const onSubmit = (values: {
-    label: string;
-    helpText: string;
-    thumbnail: string;
-  }) => {
+  const onSubmit = (values: { label: string; helpText: string; thumbnail: string }) => {
     if (!values.label) return;
     const uuid = uuidv4();
     onAddCollection?.({
@@ -53,11 +49,15 @@ export const AddToCollection: React.FC<{
                 return undefined;
               }}
             />
-            <TextAreaField label={t('Description')} name='helpText' />
+            <TextAreaField
+              label={t('Description')}
+              name='helpText'
+            />
             <ImageUploaderField
               label={t('Thumbnail')}
               name={'thumbnail'}
               uploadHandler={onUploadImage}
+              mediaLibraryRef={mediaLibraryRef}
               validate={(val: string) => {
                 if (!val) return t('Thumbnail required!');
                 return undefined;

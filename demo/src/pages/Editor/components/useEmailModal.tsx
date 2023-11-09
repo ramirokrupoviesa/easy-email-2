@@ -62,10 +62,10 @@ export function useEmailModal() {
             closeModal();
             Message.success('Email send!');
           },
-        })
+        }),
       );
     },
-    [dispatch, emailData]
+    [dispatch, emailData],
   );
 
   const openModal = (value: IEmailTemplate, mergeTags: any) => {
@@ -100,7 +100,11 @@ export function useEmailModal() {
             onOk={() => handleSubmit()}
             onCancel={closeModal}
           >
-            <TextField autoFocus name='toEmail' label='To email' />
+            <TextField
+              autoFocus
+              name='toEmail'
+              label='To email'
+            />
             <TextAreaField
               rows={15}
               autoFocus

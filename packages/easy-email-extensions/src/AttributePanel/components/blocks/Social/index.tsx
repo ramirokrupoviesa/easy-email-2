@@ -192,7 +192,7 @@ function SocialElement({
   index: number;
 }) {
   const { focusIdx } = useFocusIdx();
-  const { onUploadImage, socialIcons } = useEditorProps();
+  const { onUploadImage, socialIcons, mediaLibraryRef } = useEditorProps();
 
   const autoCompleteOptions = useMemo(() => {
     if (!socialIcons) return undefined;
@@ -213,6 +213,7 @@ function SocialElement({
         name={`${focusIdx}.data.value.elements.[${index}].src`}
         //helpText={t('The image suffix should be .jpg, jpeg, png, gif, etc. Otherwise, the picture may not be displayed normally.')}
         uploadHandler={onUploadImage}
+        mediaLibraryRef={mediaLibraryRef}
       />
 
       <Grid.Row>
