@@ -241,10 +241,8 @@ interface Props {
 }
 
 export default function Editor(props: Props) {
-  const { height, mediaLibraryRef, templateData, type, variables, onChange } = props;
-
-  const template = { ...iv, ...JSON.parse(templateData) };
-
+  const { height, mediaLibraryRef, templateData, type, variables = {}, onChange } = props;
+  const template = { ...iv, ...JSON.parse(templateData || '{}') };
   // const [initialValues, setInitialValues] = useState<IEmailTemplate>(template);
   const mergeTags = parseTags(variables);
 

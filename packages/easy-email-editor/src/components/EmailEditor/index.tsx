@@ -17,7 +17,7 @@ import { EventManager, EventType } from '@/utils/EventManager';
 
 (window as any).global = window; // react-codemirror
 
-export const EmailEditor = props => {
+export const EmailEditor = (props: any) => {
   const { toolBar } = props;
   const { height: containerHeight } = useEditorProps();
   const { setActiveTab, activeTab } = useActiveTab();

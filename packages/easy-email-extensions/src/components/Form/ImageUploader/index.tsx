@@ -27,7 +27,7 @@ import { classnames } from '@extensions/AttributePanel/utils/classnames';
 import { MergeTags } from '@extensions';
 import { IconFont, useEditorProps } from 'easy-email-editor';
 
-type MediaBrowserRef = {
+export type MediaBrowserRef = {
   value: string | undefined;
   target: string | undefined;
   showModal: () => void;

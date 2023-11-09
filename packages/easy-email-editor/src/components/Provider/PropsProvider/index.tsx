@@ -14,7 +14,16 @@ export interface BlockGroup {
   blocks: Array<CollectedBlock>;
 }
 
+export type MediaBrowserRef = {
+  value: string | undefined;
+  target: string | undefined;
+  showModal: () => void;
+  setValue: (val: string | undefined) => void;
+  setTarget: (target: string) => void;
+};
+
 export interface PropsProviderProps {
+  mediaLibraryRef: MediaBrowserRef;
   children?: React.ReactNode;
   height: string;
   fontList?: { value: string; label: string }[];
@@ -56,6 +65,13 @@ export const EditorPropsContext = React.createContext<
     mergeTagGenerate: Required<PropsProviderProps['mergeTagGenerate']>;
   }
 >({
+  mediaLibraryRef: {
+    value: undefined,
+    target: undefined,
+    showModal: () => {},
+    setValue: () => {},
+    setTarget: () => {},
+  },
   children: null,
   height: '100vh',
   fontList: [],

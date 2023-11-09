@@ -19,6 +19,7 @@ export default defineConfig({
   optimizeDeps: {},
   define: {},
   build: {
+    // outDir: 'lib',
     minify: true,
     manifest: true,
     sourcemap: true,
@@ -68,7 +69,7 @@ export default defineConfig({
         },
       ],
     }),
-    qiankun('easyBlockEditor', {
+    qiankun('email-editor', {
       useDevMode: false,
     }),
     injectHtml({
@@ -77,4 +78,5 @@ export default defineConfig({
       },
     }),
   ].filter(Boolean),
+  base: 'https://email-editor.flowx.pro/',
 });
