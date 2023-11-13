@@ -38,7 +38,7 @@ export function AutoSaveAndRestoreEmail(props) {
     // if (dirty) {
     // setCurrentEmail(formState.values);
     // }
-  }, [dirty, formState.values]);
+  }, [formState.values]);
 
   // useInterval(() => {
   // if (dirty) {

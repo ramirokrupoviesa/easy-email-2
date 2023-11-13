@@ -1,6 +1,8 @@
 /* eslint-disable react/jsx-wrap-multilines */
 import React, {
   useCallback,
+  useMemo,
+  useState,
   // useEffect,
   // useMemo,
   // useState,
@@ -16,12 +18,12 @@ import {
   Button,
   ConfigProvider,
   Dropdown,
-  // Form,
-  // Input,
+  Form,
+  Input,
   Menu,
-  // Message,
-  // Modal,
-  PageHeader,
+  Message,
+  Modal,
+  // PageHeader,
   // Select,
 } from '@arco-design/web-react';
 // import { useQuery } from '@demo/hooks/useQuery';
@@ -59,6 +61,7 @@ import {
   AdvancedType,
   BasicType,
   BlockManager,
+  IBlockData,
   // IBlockData,
   // IBlockData,
   JsonToMjml,
@@ -69,7 +72,7 @@ import {
   MjmlToJson,
   StandardLayout,
 } from 'easy-email-extensions';
-import { AutoSaveAndRestoreEmail } from '@demo/components/AutoSaveAndRestoreEmail';
+// import { AutoSaveAndRestoreEmail } from '@demo/components/AutoSaveAndRestoreEmail';
 
 // Register external blocks
 import './components/CustomBlocks';
@@ -89,6 +92,9 @@ import { Uploader } from '@demo/utils/Uploader';
 // import axios from 'axios';
 import enUS from '@arco-design/web-react/es/locale/en-US';
 import { parseTags } from '@demo/utils/tags';
+import { cloneDeep, isEqual } from 'lodash';
+import { AutoSaveAndRestoreEmail } from '@demo/components/AutoSaveAndRestoreEmail';
+import { useAppSelector } from '@demo/hooks/useAppSelector';
 
 console.log(localesData);
 
@@ -237,13 +243,21 @@ interface Props {
   type: 'json';
   templateData: string;
   variables: Record<string, string[]>;
-  onChange: (fields: { content_type: 'json'; content: string }) => void;
+  onChange: (values: { fields: { content_type: 'json'; content: string } }) => void;
+  sendTestEmail: (email: string) => boolean;
 }
 
 export default function Editor(props: Props) {
-  const { height, mediaLibraryRef, templateData, type, variables = {}, onChange } = props;
+  const {
+    height,
+    mediaLibraryRef,
+    templateData,
+    type,
+    variables = {},
+    onChange,
+    sendTestEmail,
+  } = props;
   const template = { ...iv, ...JSON.parse(templateData || '{}') };
-  // const [initialValues, setInitialValues] = useState<IEmailTemplate>(template);
   const mergeTags = parseTags(variables);
 
   // const [isDarkMode, setIsDarkMode] = useState(false);
@@ -253,9 +267,10 @@ export default function Editor(props: Props) {
   // const templateData = useAppSelector('template');
   // const [locale, setLocale] = useState('en');
   // const { addCollection, removeCollection, collectionCategory } = useCollection();
-  // const [visible, setVisible] = useState(false);
-  // const [text, setText] = useState('');
+  const [visible, setVisible] = useState(false);
+  const [text, setText] = useState('');
   const { width } = useWindowSize();
+  const [initialValues, setInitialValues] = useState(template);
 
   // const emailPattern =
   //   // eslint-disable-next-line
@@ -482,16 +497,9 @@ export default function Editor(props: Props) {
     // Message.clear();
   };
 
-  // const initialValues: IEmailTemplate | null = useMemo(() => {
-  //   if (!templateData) return null;
-  //   const sourceData = cloneDeep(templateData.content) as IBlockData;
-  //   return {
-  //     ...templateData,
-  //     content: sourceData, // replace standard block
-  //   };
-  // }, [templateData]);
+  // console.log(initialValues.content.children[0].children[0].data.value);
 
-  // const onSubmit = useCallback(
+  // const onSubmit =   Callback(
   //   async (
   //     values: IEmailTemplate,
   //     form: FormApi<IEmailTemplate, Partial<IEmailTemplate>>,
@@ -544,6 +552,23 @@ export default function Editor(props: Props) {
     [],
   );
 
+  const onSubmit = useCallback(async values => {
+    const isChanged = !(
+      isEqual(template.content, values.content) &&
+      isEqual(template.subTitle, values?.subTitle) &&
+      isEqual(template.subject, values?.subject)
+    );
+    if (isChanged) {
+      onChange({
+        fields: {
+          content_type: 'json',
+          content: JSON.stringify(values).replaceAll('\\', '\\\\'),
+        },
+      });
+    }
+    return;
+  }, []);
+
   // const themeStyleText = useMemo(() => {
   //   if (theme === 'green') return greenTheme;
   //   if (theme === 'purple') return purpleTheme;
@@ -566,7 +591,7 @@ export default function Editor(props: Props) {
         <EmailEditorProvider
           // key={id}
           height={height}
-          data={template}
+          data={initialValues}
           // interactiveStyle={{
           //   hoverColor: '#78A349',
           //   selectedColor: '#1890ff',
@@ -588,6 +613,9 @@ export default function Editor(props: Props) {
           // locale={localesData[locale]}
           locale={localesData.en}
           mediaLibraryRef={mediaLibraryRef}
+          onSubmit={() => {
+            console.log('SUBMITTING');
+          }}
         >
           {({ values }, { submit, restart }) => {
             return (
@@ -600,30 +628,12 @@ export default function Editor(props: Props) {
                   <EmailEditor
                     toolBar={
                       <Stack>
-                        <Dropdown
-                          droplist={
-                            <Menu>
-                              <Menu.Item
-                                key='MJML'
-                                onClick={() => onImportMJML({ restart })}
-                              >
-                                Import from MJML
-                              </Menu.Item>
-
-                              {/* <Menu.Item
-                              key='JSON'
-                              onClick={() => onImportJSON({ restart })}
-                            >
-                              Import from JSON
-                            </Menu.Item> */}
-                            </Menu>
-                          }
-                        >
-                          <Button>
-                            <strong>Import</strong>
-                          </Button>
-                        </Dropdown>
-
+                        <Button onClick={() => setVisible(true)}>
+                          <strong>Send test email</strong>
+                        </Button>
+                        <Button onClick={() => onImportMJML({ restart })}>
+                          <strong>Import MJML</strong>
+                        </Button>
                         <Dropdown
                           droplist={
                             <Menu>
@@ -663,18 +673,27 @@ export default function Editor(props: Props) {
                     }
                   />
                 </StandardLayout>
-                {/* <AutoSaveAndRestoreEmail onChange={onChange} /> */}
+                <AutoSaveAndRestoreEmail
+                  onChange={payload => {
+                    setInitialValues(JSON.parse(payload.fields.content));
+                    onChange(payload);
+                  }}
+                />
               </>
             );
           }}
         </EmailEditorProvider>
         {/* {modal} */}
         {/* {mergeTagsModal} */}
-        {/* <Modal
-          title={<p style={{ textAlign: 'left' }}>Leave your email</p>}
+        <Modal
+          title={<p style={{ textAlign: 'left', margin: 0 }}>Enter your email</p>}
           visible={visible}
           onCancel={() => setVisible(false)}
-          onOk={postEmail}
+          onOk={() => {
+            if (sendTestEmail(text)) {
+              setVisible(false);
+            }
+          }}
         >
           <Form.Item label='Email'>
             <Input
@@ -682,7 +701,7 @@ export default function Editor(props: Props) {
               onChange={setText}
             />
           </Form.Item>
-        </Modal> */}
+        </Modal>
         {/* <style>{`#bmc-wbtn {display:none !important;}`}</style> */}
       </div>
     </ConfigProvider>
