@@ -81,5 +81,5 @@ export default defineConfig({
       },
     }),
   ].filter(Boolean),
-  // base: 'https://email-editor.flowx.pro/',
+  base: process.env.VITE_APP_URL || 'http://localhost:5000',
 });
