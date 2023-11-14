@@ -675,8 +675,8 @@ export default function Editor(props: Props) {
                 </StandardLayout>
                 <AutoSaveAndRestoreEmail
                   onChange={payload => {
-                    setInitialValues(JSON.parse(payload.fields.content));
-                    onChange(payload);
+                    // setInitialValues(JSON.parse(payload.fields.content));
+                    // onChange(payload);
                   }}
                 />
               </>

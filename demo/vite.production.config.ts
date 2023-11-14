@@ -18,6 +18,9 @@ export default defineConfig({
   },
   optimizeDeps: {},
   define: {},
+  esbuild: {
+    jsxInject: 'import "@arco-design/web-react/dist/css/arco.css";',
+  },
   build: {
     // outDir: 'lib',
     minify: true,
@@ -78,5 +81,5 @@ export default defineConfig({
       },
     }),
   ].filter(Boolean),
-  base: 'https://email-editor.flowx.pro/',
+  // base: 'https://email-editor.flowx.pro/',
 });
