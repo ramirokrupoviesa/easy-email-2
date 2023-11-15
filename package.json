@@ -14,10 +14,11 @@
     "test:extensions": "cd packages/easy-email-extensions && yarn test",
     "translate": "ts-node scripts/translate.ts",
     "lint": "lerna exec -- yarn format",
-    "install-all-2": "npm run install-all-2:core && npm run install-all-2:editor && npm run install-all-2:extensions",
+    "install-all-2": "npm run install-all-2:core && npm run install-all-2:editor && npm run install-all-2:extensions && npm run install-all-2:demo",
     "install-all-2:core": "cd packages/easy-email-core && npm install",
     "install-all-2:editor": "cd packages/easy-email-editor && npm install --legacy-peer-deps",
     "install-all-2:extensions": "cd packages/easy-email-extensions && npm install --legacy-peer-deps",
+    "install-all-2:demo": "cd demo && npm install",
     "demo-2": "cd demo && npm run build"
   },
   "dependencies": {
