@@ -19,6 +19,10 @@
     "install-all-2:editor": "cd packages/easy-email-editor && npm install --legacy-peer-deps",
     "install-all-2:extensions": "cd packages/easy-email-extensions && npm install --legacy-peer-deps",
     "install-all-2:demo": "cd demo && npm install",
+    "build-2": "npm run build-2:core && npm run build-2:editor && npm run build-2:extensions",
+    "build-2:core": "cd packages/easy-email-core && npm run build",
+    "build-2:editor": "cd packages/easy-email-editor && npm run build",
+    "build-2:extensions": "cd packages/easy-email-extensions && npm run build",
     "demo-2": "cd demo && npm run build"
   },
   "dependencies": {
